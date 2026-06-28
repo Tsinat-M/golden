@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Admin – Golden Lounge Oslo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet" />
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --gold:#C9A84C;--gold-light:#E8C96A;--gold-dim:#8B6914;
+    --obsidian:#0A0A0A;--charcoal:#141414;--slate:#1E1E1E;
+    --cream:#F5EDD6;--text:#E8DCC8;--muted:#9A8A70;--danger:#E05A3A;
+    --font-display:'Cinzel Decorative',serif;
+    --font-body:'Libre Baskerville',serif;
+    --font-ui:'Josefin Sans',sans-serif;
+  }
+  body{background:var(--obsidian);color:var(--text);font-family:var(--font-body);line-height:1.6;min-height:100vh}
+  a{color:var(--gold)}
+  .wrap{max-width:880px;margin:0 auto;padding:2rem 1.25rem 5rem}
+
+  header.bar{display:flex;align-items:center;justify-content:space-between;
+    padding:1.2rem 0;border-bottom:1px solid rgba(201,168,76,.18);margin-bottom:2rem;flex-wrap:wrap;gap:1rem}
+  .brand{font-family:var(--font-display);color:var(--gold);font-size:1.15rem;letter-spacing:.04em}
+  .brand small{display:block;font-family:var(--font-ui);font-size:.62rem;letter-spacing:.25em;
+    text-transform:uppercase;color:var(--muted);margin-top:.2rem}
+
+  /* ---- Knapper ---- */
+  button{font-family:var(--font-ui);cursor:pointer;border:none;border-radius:2px;
+    letter-spacing:.12em;text-transform:uppercase;font-size:.72rem;font-weight:600;
+    padding:.7rem 1.2rem;transition:filter .15s,background .15s,color .15s}
+  .btn-gold{background:var(--gold);color:var(--obsidian)}
+  .btn-gold:hover{filter:brightness(1.1)}
+  .btn-ghost{background:transparent;color:var(--muted);border:1px solid rgba(201,168,76,.3)}
+  .btn-ghost:hover{color:var(--gold);border-color:var(--gold)}
+  .btn-danger{background:transparent;color:var(--danger);border:1px solid rgba(224,90,58,.4)}
+  .btn-danger:hover{background:rgba(224,90,58,.12)}
+  button:disabled{opacity:.45;cursor:not-allowed;filter:none}
+
+  /* ---- Skjemafelt ---- */
+  label{display:block;font-family:var(--font-ui);font-size:.62rem;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--muted);margin:0 0 .35rem}
+  input,select,textarea{width:100%;background:var(--slate);color:var(--cream);
+    border:1px solid rgba(201,168,76,.18);border-radius:2px;padding:.65rem .75rem;
+    font-family:var(--font-body);font-size:.95rem}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
+  textarea{resize:vertical;min-height:70px}
+
+  /* ---- Innlogging ---- */
+  #login{max-width:380px;margin:8vh auto 0;text-align:center}
+  #login h1{font-family:var(--font-display);color:var(--cream);font-size:1.5rem;margin-bottom:.4rem}
+  #login p.sub{color:var(--muted);font-size:.85rem;margin-bottom:2rem}
+  #login form{display:grid;gap:1rem;text-align:left}
+  #login button{width:100%;margin-top:.5rem}
+
+  /* ---- Liste ---- */
+  .toolbar{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1.5rem}
+  .cat-head{font-family:var(--font-display);color:var(--gold);font-size:1.05rem;
+    margin:2rem 0 .8rem;padding-bottom:.4rem;border-bottom:1px solid rgba(201,168,76,.15)}
+  .dish{background:var(--charcoal);border:1px solid rgba(201,168,76,.12);
+    border-radius:3px;padding:1.1rem;margin-bottom:.8rem}
+  .dish-top{display:flex;justify-content:space-between;align-items:center;gap:1rem;cursor:pointer}
+  .dish-title{font-weight:700;color:var(--cream);font-size:1rem}
+  .dish-meta{font-family:var(--font-ui);font-size:.78rem;color:var(--muted)}
+  .dish-price{font-family:var(--font-ui);color:var(--gold);font-weight:600;white-space:nowrap}
+  .dish-edit{display:none;margin-top:1rem;padding-top:1rem;border-top:1px solid rgba(201,168,76,.12);
+    display:none;gap:.9rem;grid-template-columns:1fr 1fr}
+  .dish.open .dish-edit{display:grid}
+  .dish-edit .full{grid-column:1 / -1}
+  .badges{display:flex;gap:1.2rem;flex-wrap:wrap}
+  .badges label{display:flex;align-items:center;gap:.4rem;margin:0;text-transform:none;letter-spacing:0;font-size:.85rem;color:var(--text)}
+  .badges input{width:auto}
+  .row-actions{grid-column:1 / -1;display:flex;justify-content:space-between;gap:.6rem;flex-wrap:wrap}
+
+  .toast{position:fixed;left:50%;bottom:1.5rem;transform:translateX(-50%);
+    background:var(--slate);color:var(--cream);border:1px solid var(--gold);
+    padding:.7rem 1.2rem;border-radius:3px;font-family:var(--font-ui);font-size:.8rem;
+    opacity:0;pointer-events:none;transition:opacity .25s}
+  .toast.show{opacity:1}
+  .err{color:var(--danger);font-size:.82rem;min-height:1.1rem}
+  .hidden{display:none !important}
+  .empty{color:var(--muted);font-style:italic;padding:1rem 0}
+  @media(max-width:560px){.dish-edit{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- ============ INNLOGGING ============ -->
+<section id="login">
+  <h1>Golden Lounge</h1>
+  <p class="sub">Logg inn for å redigere menyen</p>
+  <form id="loginForm">
+    <div>
+      <label for="email">E-post</label>
+      <input id="email" type="email" autocomplete="username" required />
+    </div>
+    <div>
+      <label for="pass">Passord</label>
+      <input id="pass" type="password" autocomplete="current-password" required />
+    </div>
+    <button class="btn-gold" type="submit">Logg inn</button>
+    <p class="err" id="loginErr"></p>
+    <p style="text-align:center;margin-top:.4rem">
+      <a href="#" id="forgotLink" style="font-family:var(--font-ui);font-size:.78rem;letter-spacing:.06em;color:var(--muted);text-decoration:none">Glemt passord?</a>
+    </p>
+  </form>
+</section>
+
+<!-- ============ ADMIN ============ -->
+<div id="app" class="wrap hidden">
+  <header class="bar">
+    <div class="brand">Golden Lounge<small>Menyadministrasjon</small></div>
+    <div style="display:flex;gap:.6rem">
+      <a href="meny.html" target="_blank"><button class="btn-ghost" type="button">Se siden</button></a>
+      <button class="btn-ghost" id="logoutBtn" type="button">Logg ut</button>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <button class="btn-gold" id="addBtn" type="button">+ Legg til rett</button>
+    <button class="btn-ghost" id="seedBtn" type="button">Importer startmeny</button>
+    <button class="btn-danger" id="clearBtn" type="button">Tøm hele menyen</button>
+  </div>
+
+  <div id="list"><p class="empty">Laster …</p></div>
+
+  <section id="bgSection" style="margin-top:3rem">
+    <h2 class="cat-head">Bakgrunnsbilder (lysbildevisning)</h2>
+    <p style="color:var(--muted);font-size:.85rem;margin-bottom:1rem">
+      Skriv inn stien til hvert bilde i <code>image</code>-mappen, f.eks. <code>image/slide1.jpg</code>.
+      Rekkefølgen her blir rekkefølgen i lysbildevisningen på alle sidene.
+      Lar du lista være tom, beholdes standardbildene som ligger i sidene.
+    </p>
+    <div id="bgList"></div>
+    <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1rem">
+      <label class="btn-ghost" style="cursor:pointer;margin:0">Last opp fra PC
+        <input type="file" accept="image/*" id="bgUpload" style="display:none">
+      </label>
+      <button class="btn-ghost" id="bgAddBtn" type="button">+ Legg til via adresse</button>
+      <button class="btn-gold" id="bgSaveBtn" type="button">Lagre bakgrunnsbilder</button>
+    </div>
+    <p class="upl-status" id="bgUplStatus" style="font-size:.78rem;color:var(--muted);margin-top:.5rem"></p>
+  </section>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ============ LOGIKK ============ -->
+<script type="module">
+import { auth, db, storage } from "./firebase-config.js";
+import {
+  signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail
+} from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
+import {
+  collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, setDoc, query, orderBy
+} from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+import {
+  ref as storageRef, uploadBytes, getDownloadURL
+} from "https://www.gstatic.com/firebasejs/12.15.0/firebase-storage.js";
+
+// Laster opp en bildefil til Firebase Storage og returnerer URL-en
+async function uploadImage(file, folder){
+  const safe = file.name.replace(/[^\w.\-]/g, "_");
+  const r = storageRef(storage, folder + "/" + Date.now() + "_" + safe);
+  await uploadBytes(r, file);
+  return await getDownloadURL(r);
+}
+
+const $  = s => document.querySelector(s);
+const CATS = { kjott:"Kjøttretter", veg:"Vegetar & Vegan", drikke:"Drikke", dessert:"Dessert" };
+const BADGES = { veg:"Vegetar", vegan:"Vegan", spicy:"Sterk" };
+const SUBS  = { alkoholfri:"Alkoholfri", shot:"Shot", miks:"Miksedrikker", ol:"Øl" };
+
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2200); }
+function esc(s){ return String(s ?? "").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+/* ---------- Innlogging ---------- */
+$("#loginForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  $("#loginErr").textContent = "";
+  try {
+    await signInWithEmailAndPassword(auth, $("#email").value.trim(), $("#pass").value);
+  } catch (err) {
+    $("#loginErr").textContent = "Feil e-post eller passord.";
+    console.error(err);
+  }
+});
+$("#logoutBtn").addEventListener("click", () => signOut(auth));
+
+$("#forgotLink").addEventListener("click", async (e) => {
+  e.preventDefault();
+  const email = $("#email").value.trim();
+  $("#loginErr").textContent = "";
+  if (!email) {
+    $("#loginErr").textContent = "Skriv inn e-posten din i feltet over først.";
+    return;
+  }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    $("#loginErr").style.color = "var(--gold)";
+    $("#loginErr").textContent = "Sjekk e-posten din – vi har sendt en lenke for å lage nytt passord.";
+  } catch (err) {
+    $("#loginErr").style.color = "";
+    $("#loginErr").textContent = "Kunne ikke sende e-post. Sjekk at adressen er riktig.";
+    console.error(err);
+  }
+});
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    $("#login").classList.add("hidden");
+    $("#app").classList.remove("hidden");
+    render();
+    loadBackgrounds();
+  } else {
+    $("#app").classList.add("hidden");
+    $("#login").classList.remove("hidden");
+    $("#pass").value = "";
+  }
+});
+
+/* ---------- Hent + vis ---------- */
+async function fetchDishes(){
+  const snap = await getDocs(query(collection(db,"menu"), orderBy("order")));
+  return snap.docs.map(d => ({ id:d.id, ...d.data() }));
+}
+
+function dishRow(d){
+  const badgeOpts = Object.entries(BADGES).map(([k,label]) =>
+    `<label><input type="checkbox" data-badge="${k}" ${ (d.badges||[]).includes(k) ? "checked":"" }> ${label}</label>`
+  ).join("");
+  const catOpts = Object.entries(CATS).map(([k,label]) =>
+    `<option value="${k}" ${d.category===k?"selected":""}>${label}</option>`).join("");
+  const subOpts = `<option value="">– velg gruppe –</option>` + Object.entries(SUBS).map(([k,label]) =>
+    `<option value="${k}" ${d.subcat===k?"selected":""}>${label}</option>`).join("");
+
+  return `<div class="dish" data-id="${d.id}">
+    <div class="dish-top">
+      <div>
+        <div class="dish-title">${esc(d.name)||"(uten navn)"}</div>
+        <div class="dish-meta">${esc(d.geez)||"&nbsp;"}</div>
+      </div>
+      <div class="dish-price">${esc(d.price)} kr</div>
+    </div>
+    <div class="dish-edit">
+      <div class="full"><label>Navn</label><input data-f="name" value="${esc(d.name)}"></div>
+      <div><label>Ge'ez / tigrinja (valgfritt)</label><input data-f="geez" value="${esc(d.geez)}"></div>
+      <div><label>Pris (kr)</label><input data-f="price" type="number" inputmode="numeric" value="${esc(d.price)}"></div>
+      <div class="full"><label>Beskrivelse</label><textarea data-f="desc">${esc(d.desc)}</textarea></div>
+      <div class="full"><label>Bilde</label>
+        <input data-f="image" value="${esc(d.image)}" placeholder="Last opp under, eller lim inn en bildeadresse" oninput="const p=this.parentNode.querySelector('.img-prev');p.src=this.value;p.style.display=this.value?'block':'none'">
+        <div style="display:flex;gap:.7rem;align-items:center;margin-top:.5rem">
+          <input type="file" accept="image/*" data-upload="dish" style="font-size:.78rem;color:var(--muted)">
+          <span class="upl-status" style="font-size:.78rem;color:var(--muted)"></span>
+        </div>
+        <img class="img-prev" src="${esc(d.image)}" alt="" style="margin-top:.5rem;max-height:110px;border-radius:3px;display:${d.image?'block':'none'}" onerror="this.style.display='none'">
+      </div>
+      <div><label>Kategori</label><select data-f="category" onchange="this.closest('.dish-edit').querySelector('.subcat-wrap').style.display=this.value==='drikke'?'block':'none'">${catOpts}</select></div>
+      <div><label>Merker</label><div class="badges">${badgeOpts}</div></div>
+      <div class="full subcat-wrap" style="display:${d.category==='drikke'?'block':'none'}"><label>Drikke-gruppe (kun for drikke)</label><select data-f="subcat">${subOpts}</select></div>
+      <div class="row-actions">
+        <button class="btn-danger" data-act="delete" type="button">Slett rett</button>
+        <button class="btn-gold" data-act="save" type="button">Lagre endringer</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function render(){
+  const list = $("#list");
+  list.innerHTML = `<p class="empty">Laster …</p>`;
+  let dishes;
+  try { dishes = await fetchDishes(); }
+  catch(err){ list.innerHTML = `<p class="err">Kunne ikke laste menyen. Sjekk at firebase-config.js er fylt ut.</p>`; console.error(err); return; }
+
+  if(!dishes.length){
+    list.innerHTML = `<p class="empty">Ingen retter ennå. Klikk «Importer startmeny» for å legge inn dagens meny, eller «+ Legg til rett».</p>`;
+    return;
+  }
+
+  let html = "";
+  for(const cat of Object.keys(CATS)){
+    const inCat = dishes.filter(d => d.category === cat);
+    if(!inCat.length) continue;
+    html += `<h2 class="cat-head">${CATS[cat]}</h2>` + inCat.map(dishRow).join("");
+  }
+  list.innerHTML = html;
+}
+
+/* ---------- Klikk i lista (åpne/lagre/slette) ---------- */
+$("#list").addEventListener("click", async e => {
+  const dishEl = e.target.closest(".dish");
+  if(!dishEl) return;
+  const id = dishEl.dataset.id;
+
+  if(e.target.closest(".dish-top")){ dishEl.classList.toggle("open"); return; }
+
+  const act = e.target.dataset.act;
+  if(act === "save"){
+    const data = {
+      name:     dishEl.querySelector('[data-f="name"]').value.trim(),
+      geez:     dishEl.querySelector('[data-f="geez"]').value.trim(),
+      price:    Number(dishEl.querySelector('[data-f="price"]').value) || 0,
+      desc:     dishEl.querySelector('[data-f="desc"]').value.trim(),
+      image:    dishEl.querySelector('[data-f="image"]').value.trim(),
+      category: dishEl.querySelector('[data-f="category"]').value,
+      subcat:   dishEl.querySelector('[data-f="subcat"]').value,
+      badges:   [...dishEl.querySelectorAll('[data-badge]:checked')].map(c=>c.dataset.badge)
+    };
+    if(!data.name){ toast("Retten må ha et navn."); return; }
+    e.target.disabled = true;
+    try { await updateDoc(doc(db,"menu",id), data); toast("Lagret ✓"); await render(); }
+    catch(err){ toast("Kunne ikke lagre."); console.error(err); e.target.disabled=false; }
+  }
+
+  if(act === "delete"){
+    const name = dishEl.querySelector('.dish-title').textContent;
+    if(!confirm(`Slette «${name}»? Dette kan ikke angres.`)) return;
+    try { await deleteDoc(doc(db,"menu",id)); toast("Slettet"); await render(); }
+    catch(err){ toast("Kunne ikke slette."); console.error(err); }
+  }
+});
+
+/* ---------- Last opp rettbilde fra PC ---------- */
+$("#list").addEventListener("change", async e => {
+  const inp = e.target;
+  if(inp.dataset.upload !== "dish") return;
+  const file = inp.files && inp.files[0];
+  if(!file) return;
+  const dishEl  = inp.closest(".dish");
+  const status  = dishEl.querySelector(".upl-status");
+  const imgField= dishEl.querySelector('[data-f="image"]');
+  const prev    = dishEl.querySelector(".img-prev");
+  status.textContent = "Laster opp …";
+  try {
+    const url = await uploadImage(file, "dishes");
+    imgField.value = url;
+    prev.src = url; prev.style.display = "block";
+    status.textContent = "Lastet opp ✓ – husk å trykke Lagre";
+  } catch(err){
+    status.textContent = "Opplasting feilet";
+    console.error(err);
+  }
+});
+
+/* ---------- Ny rett ---------- */
+$("#addBtn").addEventListener("click", async () => {
+  try {
+    const existing = await fetchDishes();
+    const nextOrder = existing.length ? Math.max(...existing.map(d=>d.order||0)) + 1 : 1;
+    const ref = await addDoc(collection(db,"menu"), {
+      name:"Ny rett", geez:"", price:0, desc:"", image:"", category:"kjott", subcat:"", badges:[], order:nextOrder
+    });
+    await render();
+    const el = document.querySelector(`.dish[data-id="${ref.id}"]`);
+    if(el){ el.classList.add("open"); el.scrollIntoView({behavior:"smooth",block:"center"}); el.querySelector('[data-f="name"]').select(); }
+    toast("Ny rett lagt til – fyll inn og lagre.");
+  } catch(err){ toast("Kunne ikke legge til."); console.error(err); }
+});
+
+/* ---------- Importer startmeny (kun hvis tom) ---------- */
+const STARTER = [
+  {category:"kjott", name:"KEY WET / ZIGNI", geez:"ዝግኒ", price:299, desc:"Oksekjøtt tilberedt med løk, berbere (chili), hvitløk, ingefær og smør. Serveres med injera.", badges:[]},
+  {category:"kjott", name:"DERO WET / TSEBHI DORHO", geez:"ደርሆ", price:299, desc:"Kyllinggryte med berbere, løk, hvitløk og krydder. Serveres med injera og kokt egg.", badges:[]},
+  {category:"kjott", name:"TIBSI WHITE & RED / TIBSI", geez:"ቀይሕ ጥብሲ / ጻዕዳ ጥብሲ", price:289, desc:"Finhakket råbiff krydret med mitmita og klarnet smør (niter kibbeh).", badges:[]},
+  {category:"kjott", name:"KITFO / KITFO", geez:"ክትፎ", price:350, desc:"Fersk hakket oksekjøtt med krydret smør (mitmita). Serveres med injera.", badges:[]},
+  {category:"kjott", name:"GORED / GORED GORED", geez:"ጎረድ ጎረድ", price:350, desc:"Møre biter av oksekjøtt servert med krydret smør og mitmita. Serveres med injera.", badges:[]},
+  {category:"kjott", name:"ZILZIL / ZILZIL", geez:"ዝልዝል", price:390, desc:"Strimler av oksekjøtt stekt i smør, urter og krydder. Serveres med injera.", badges:[]},
+  {category:"veg", name:"VEGAN YETSOM", geez:"ናይ ጾም", price:269, desc:"En sammensetning av vegetariske retter med linser, grønnsaker og krydder. Serveres med injera.", badges:[]},
+  {category:"veg", name:"SHIRO", geez:"ሽሮ", price:250, desc:"Kremet gryte av malte kikerter med løk, hvitløk og berbere. Serveres med injera.", badges:[]},
+  {category:"veg", name:"FIRFIR", geez:"ፍርፍር", price:269, desc:"Strimlet injera med krydret saus, løk og smør. Serveres varm.", badges:[]},
+  {category:"drikke", name:"Eritreisk Kaffeseremoni", geez:"ቡና", price:95, desc:"Tradisjonell kaffeseremoni – tre kopper serveres med røkelse og popcorn.", badges:[], subcat:"alkoholfri"}
+];
+$("#seedBtn").addEventListener("click", async () => {
+  try {
+    const existing = await fetchDishes();
+    if(existing.length && !confirm("Det finnes allerede retter. Vil du legge til startmenyen i tillegg?")) return;
+    let order = existing.length ? Math.max(...existing.map(d=>d.order||0)) : 0;
+    for(const item of STARTER){ order++; await addDoc(collection(db,"menu"), {...item, order}); }
+    toast("Startmeny importert ✓");
+    await render();
+  } catch(err){ toast("Import feilet – sjekk oppsett."); console.error(err); }
+});
+
+/* ---------- Tøm hele menyen ---------- */
+$("#clearBtn").addEventListener("click", async () => {
+  if(!confirm("Dette sletter ALLE retter i menyen. Er du sikker?")) return;
+  if(!confirm("Helt sikker? Dette kan ikke angres.")) return;
+  try {
+    const all = await fetchDishes();
+    for(const d of all){ await deleteDoc(doc(db,"menu",d.id)); }
+    toast("Menyen er tømt – klikk «Importer startmeny» for å begynne på nytt.");
+    await render();
+  } catch(err){ toast("Kunne ikke tømme menyen."); console.error(err); }
+});
+let backgrounds = [];
+
+async function loadBackgrounds(){
+  try {
+    const snap = await getDoc(doc(db,"settings","site"));
+    backgrounds = (snap.exists() && Array.isArray(snap.data().backgrounds)) ? snap.data().backgrounds.slice() : [];
+  } catch(err){ backgrounds = []; console.error(err); }
+  renderBgList();
+}
+
+function syncBgFromDom(){
+  backgrounds = [...document.querySelectorAll('#bgList [data-bg]')].map(inp => inp.value);
+}
+
+function renderBgList(){
+  const wrap = $("#bgList");
+  if(!backgrounds.length){
+    wrap.innerHTML = `<p class="empty" style="padding:.5rem 0">Ingen bakgrunnsbilder valgt – standardbildene vises.</p>`;
+    return;
+  }
+  wrap.innerHTML = backgrounds.map((path,i) => `
+    <div class="bg-row" data-i="${i}" style="display:flex;gap:.6rem;align-items:center;margin-bottom:.6rem">
+      <img src="${esc(path)}" class="bg-prev" style="width:70px;height:46px;object-fit:cover;border-radius:3px;background:var(--slate);flex:none" onerror="this.style.opacity=.15" onload="this.style.opacity=1">
+      <input data-bg value="${esc(path)}" placeholder="image/slide1.jpg" style="flex:1" oninput="const p=this.parentNode.querySelector('.bg-prev');p.src=this.value;p.style.opacity=1">
+      <button class="btn-ghost" data-bgact="up" type="button" title="Flytt opp" style="padding:.5rem .7rem">↑</button>
+      <button class="btn-ghost" data-bgact="down" type="button" title="Flytt ned" style="padding:.5rem .7rem">↓</button>
+      <button class="btn-danger" data-bgact="del" type="button" title="Fjern" style="padding:.5rem .7rem">✕</button>
+    </div>`).join("");
+}
+
+$("#bgList").addEventListener("click", e => {
+  const act = e.target.dataset.bgact;
+  if(!act) return;
+  const i = +e.target.closest(".bg-row").dataset.i;
+  syncBgFromDom();
+  if(act === "del") backgrounds.splice(i,1);
+  if(act === "up" && i > 0) [backgrounds[i-1],backgrounds[i]] = [backgrounds[i],backgrounds[i-1]];
+  if(act === "down" && i < backgrounds.length-1) [backgrounds[i+1],backgrounds[i]] = [backgrounds[i],backgrounds[i+1]];
+  renderBgList();
+});
+
+$("#bgAddBtn").addEventListener("click", () => { syncBgFromDom(); backgrounds.push(""); renderBgList(); });
+
+$("#bgUpload").addEventListener("change", async e => {
+  const file = e.target.files && e.target.files[0];
+  if(!file) return;
+  const status = $("#bgUplStatus");
+  syncBgFromDom();
+  status.textContent = "Laster opp …";
+  try {
+    const url = await uploadImage(file, "backgrounds");
+    backgrounds.push(url);
+    renderBgList();
+    status.textContent = "Lastet opp ✓ – husk å trykke «Lagre bakgrunnsbilder»";
+  } catch(err){
+    status.textContent = "Opplasting feilet";
+    console.error(err);
+  }
+  e.target.value = "";
+});
+
+$("#bgSaveBtn").addEventListener("click", async () => {
+  syncBgFromDom();
+  const clean = backgrounds.map(s => s.trim()).filter(Boolean);
+  try {
+    await setDoc(doc(db,"settings","site"), { backgrounds: clean }, { merge:true });
+    backgrounds = clean;
+    renderBgList();
+    toast("Bakgrunnsbilder lagret ✓");
+  } catch(err){ toast("Kunne ikke lagre bakgrunner."); console.error(err); }
+});
+</script>
+</body>
+</html>
